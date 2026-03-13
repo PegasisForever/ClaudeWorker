@@ -58,4 +58,5 @@ RUN touch /tmp/monitor_flag
 RUN sudo usermod --shell /bin/bash kasm-user
 COPY tmux.conf /home/kasm-user/.tmux.conf
 COPY bashrc /home/kasm-user/.bashrc
+RUN rm /home/kasm-user/.bash_history
 COPY nginx-monitor.conf /etc/nginx/conf.d/monitor.conf
