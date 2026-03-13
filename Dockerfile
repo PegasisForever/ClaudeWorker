@@ -26,7 +26,7 @@ ENV PATH="/home/kasm-user/.local/bin:$PATH"
 
 # set default resolution and frame rate, and disable basic auth
 ENV VNC_RESOLUTION=1920x1080
-ENV MAX_FRAME_RATE=30
+ENV MAX_FRAME_RATE=15
 ENV VNCOPTIONS="${VNCOPTIONS} -disableBasicAuth"
 
 # GH CLI

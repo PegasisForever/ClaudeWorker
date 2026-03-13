@@ -11,6 +11,12 @@ desktop:
     width: 1920
     height: 1080
   allow_resize: false
+encoding:
+  max_frame_rate: 15
+  rect_encoding_mode:
+    min_quality: 2
+    max_quality: 5
+
 runtime_configuration:
   allow_client_to_override_kasm_server_settings: false
   allow_override_standard_vnc_server_settings: false
