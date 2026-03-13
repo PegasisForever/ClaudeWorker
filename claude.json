@@ -1,0 +1,116 @@
+{
+  "numStartups": 1,
+  "installMethod": "native",
+  "autoUpdates": false,
+  "theme": "light",
+  "cachedGrowthBookFeatures": {
+    "tengu_herring_clock": false,
+    "tengu_event_sampling_config": {},
+    "tengu_frond_boric": {},
+    "tengu_log_segment_events": false,
+    "tengu_log_datadog_events": true,
+    "tengu_cicada_nap_ms": 0,
+    "tengu_miraculo_the_bard": false,
+    "tengu_miraculo_the_bard2": false,
+    "tengu_kairos_cron": true,
+    "tengu_paper_halyard": false,
+    "tengu_quiet_hollow": true,
+    "tengu_marble_anvil": true,
+    "tengu_tool_pear": false,
+    "tengu_scarf_coffee": false,
+    "tengu_chomp_inflection": false,
+    "tengu_penguins_off": null,
+    "tengu_granite_whisper": false,
+    "tengu_streaming_text": true,
+    "tengu_hawthorn_steeple": false,
+    "tengu_amber_quartz": true,
+    "tengu-top-of-feed-tip": {
+      "tip": "",
+      "color": ""
+    },
+    "tengu_marble_whisper2": true,
+    "tengu_turtle_carbon": true,
+    "tengu_grey_step2": {
+      "enabled": true,
+      "dialogTitle": "We recommend medium effort for Opus",
+      "dialogDescription": "Effort determines how long Claude thinks for when completing your task. We recommend medium effort for most tasks to balance speed and intelligence and maximize rate limits. Use ultrathink to trigger high effort when needed."
+    },
+    "tengu_pr_status_cli": true,
+    "tengu_ccr_bridge": true,
+    "tengu_keybinding_customization_release": true,
+    "tengu_post_compact_survey": false,
+    "tengu_desktop_upsell": {
+      "enable_shortcut_tip": false,
+      "enable_startup_dialog": false
+    },
+    "tengu_claudeai_mcp_connectors": true,
+    "tengu_scratch": false,
+    "tengu_1p_event_batch_config": {
+      "scheduledDelayMillis": 10000,
+      "maxExportBatchSize": 400,
+      "maxQueueSize": 8192,
+      "path": "/api/event_logging/v2/batch"
+    },
+    "tengu_grey_wool": true,
+    "tengu_auto_mode_config": {
+      "enabled": "disabled",
+      "twoStageClassifier": true
+    },
+    "tengu_disable_bypass_permissions_mode": false,
+    "tengu_orchid_trellis": false,
+    "tengu_pid_based_version_locking": true,
+    "tengu_kairos_brief_config": {
+      "enable_slash_command": false
+    },
+    "tengu_thinkback": false,
+    "tengu_tangerine_ladder_boost": true
+  },
+  "firstStartTime": "2026-03-13T05:24:43.825Z",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "userID": "0ce6f93463cc95e4c5b8c18301d9a569f39d0da9a0363452a3c28c8e6a1b7419",
+  "changelogLastFetched": 1773379601711,
+  "autoUpdatesProtectedForNative": true,
+  "claudeCodeFirstTokenDate": "2026-03-08T19:42:06.646628Z",
+  "hasCompletedOnboarding": true,
+  "lastOnboardingVersion": "2.1.74",
+  "effortCalloutV2Dismissed": true,
+  "lastReleaseNotesSeen": "2.1.74",
+  "projects": {
+    "/home/kasm-user": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 1,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": []
+    }
+  },
+  "clientDataCache": {
+    "data": {},
+    "timestamp": 1773379627738
+  },
+  "groveConfigCache": {
+    "28eb6aea-f392-4296-b377-8c169b6df04d": {
+      "grove_enabled": true,
+      "timestamp": 1773379627750
+    }
+  },
+  "penguinModeOrgEnabled": false,
+  "passesEligibilityCache": {
+    "c43058f1-a62a-4b07-a882-0ea1160e9431": {
+      "eligible": false,
+      "referral_code_details": null,
+      "referrer_reward": null,
+      "remaining_passes": null,
+      "timestamp": 1773379627835
+    }
+  },
+  "cachedExtraUsageDisabledReason": "org_level_disabled",
+  "officialMarketplaceAutoInstallAttempted": true,
+  "officialMarketplaceAutoInstalled": true
+}

@@ -1,0 +1,7 @@
+{
+  "skipDangerousModePermissionPrompt": true,
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": ["frolicking"]
+  }
+}

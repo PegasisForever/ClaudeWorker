@@ -1,0 +1,5 @@
+node_modules/
+packages/frontend/dist/
+packages/backend/src/generated/
+monitor
+*.js.map

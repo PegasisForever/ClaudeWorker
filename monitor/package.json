@@ -1,0 +1,9 @@
+{
+  "name": "monitor",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --filter backend dev",
+    "build": "bun run scripts/build.ts"
+  },
+  "workspaces": ["packages/backend", "packages/frontend"]
+}
