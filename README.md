@@ -15,6 +15,7 @@
 
 - `pegasis0/claude-worker:latest` - Built on top of `:base` with Claude Code and additional automation. Includes:
   - Ubuntu 22.04 LTS with XFCE Desktop Environment, fixed 1080p resolution
+  - Node.js 22.x LTS
   - Screen record skill for Claude
   - Computer use MCP
   - Chrome DevTools MCP

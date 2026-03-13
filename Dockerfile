@@ -2,7 +2,7 @@ FROM pegasis0/claude-worker:base
 
 USER kasm-user
 
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | sudo bash - 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash - 
 RUN sudo apt-get update && sudo apt-get install -y \
     tmux \
     build-essential \
