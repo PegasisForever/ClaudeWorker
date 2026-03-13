@@ -1,5 +1,7 @@
 # Claude Worker Docker Image
 
+`pegasis0/claude-worker:latest`
+
 ## Image Hierarchy
 
 - `pegasis0/claude-worker:base` - Created manually from `kasmweb/ubuntu-jammy-dind:1.18.0` with the following customizations:
