@@ -516,10 +516,10 @@ function start_monitor (){
 	if [ "$(id -un)" = "kasm-user" ]; then
 		(
 			cd "$HOME"
-			exec env PORT=13001 "$monitor_process" >> "$monitor_log" 2>&1
+			exec env PORT=51301 "$monitor_process" >> "$monitor_log" 2>&1
 		) &
 	else
-		sudo -E -H -u kasm-user bash -lc "cd \"\$HOME\" && exec env PORT=13001 \"$monitor_process\" >> \"$monitor_log\" 2>&1" &
+		sudo -E -H -u kasm-user bash -lc "cd \"\$HOME\" && exec env PORT=51301 \"$monitor_process\" >> \"$monitor_log\" 2>&1" &
 	fi
 
 	KASM_PROCS['monitor']=$!

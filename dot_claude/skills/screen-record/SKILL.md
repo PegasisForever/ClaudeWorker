@@ -13,8 +13,6 @@ To record the screen using ffmpeg (X11, display :1, 1920x1080):
    2. **chrome-devtools MCP** (if computer-use is insufficient)
    3. **terminal commands** (last resort)
 
-   Before interacting with any window, **maximize it first** by clicking the maximize button in the window's title bar using the computer-use MCP. Do NOT use `super+Up` — it only tiles to half the screen and does not fully maximize.
-
 3. **Stop recording:**
    ```bash
    pkill -INT ffmpeg

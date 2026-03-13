@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 const monitorBase = "/monitor/";
-const backendOrigin = "http://localhost:13001";
+const backendOrigin = "http://localhost:51301";
 
 export default defineConfig({
   base: monitorBase,

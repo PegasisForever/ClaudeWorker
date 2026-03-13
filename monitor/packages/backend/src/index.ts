@@ -10,7 +10,7 @@ const MONITOR_API_BASE = "/monitor/api";
 const MONITOR_STATUS_PATH = `${MONITOR_API_BASE}/status`;
 const MONITOR_STOP_PATH = `${MONITOR_API_BASE}/stop`;
 const MONITOR_WS_PATH = "/monitor/ws";
-const PORT = parseInt(process.env.PORT ?? "13001", 10);
+const PORT = parseInt(process.env.PORT ?? "51301", 10);
 
 type Status = "idle" | "waiting" | "working";
 

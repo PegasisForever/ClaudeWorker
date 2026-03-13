@@ -23,11 +23,11 @@ A lightweight web-based monitor for Claude Code sessions running in tmux. Provid
 # Install dependencies
 bun install
 
-# Start the backend dev server (with hot reload) on port 13001
+# Start the backend dev server (with hot reload) on port 51301
 bun dev
 ```
 
-The frontend is served by Vite at `http://localhost:5173` with HMR. Vite proxies `/monitor/api/status` and `/monitor/ws` to the backend on `http://localhost:13001`.
+The frontend is served by Vite at `http://localhost:5173` with HMR. Vite proxies `/monitor/api/status` and `/monitor/ws` to the backend on `http://localhost:51301`.
 
 To run the frontend separately:
 ```bash
@@ -51,7 +51,7 @@ This will:
 
 ```bash
 ./monitor
-# → monitor backend running at http://localhost:13001/monitor/api/status
+# → monitor backend running at http://localhost:51301/monitor/api/status
 ```
 
 The port can be overridden with the `PORT` environment variable:

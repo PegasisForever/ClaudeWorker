@@ -40,7 +40,7 @@ This image (`pegasis0/claude-worker:latest`) is intended to be used as a **start
 ```bash
 docker run --rm -d \
   --shm-size=512m \
-  -p 13000:13000 \
+  -p 51300:51300 \
   --privileged \
   -e GITHUB_TOKEN=ghp_xxx \
   -e CLAUDE_CODE_OAUTH_TOKEN=sk-ant-xxx \
@@ -52,4 +52,4 @@ docker run --rm -d \
 
 Note: `--privileged` is required for Docker in Docker.
 
-After the container is running, you can access the desktop at `http://localhost:13000/monitor`.
+After the container is running, you can access the desktop at `http://localhost:51300/monitor`.
