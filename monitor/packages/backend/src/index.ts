@@ -1,5 +1,9 @@
 import { spawn } from "bun-pty";
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 const MONITOR_API_BASE = "/monitor/api";
@@ -11,13 +15,20 @@ const PORT = parseInt(process.env.PORT ?? "13001", 10);
 type Status = "idle" | "waiting" | "working";
 
 const HOME = process.env.HOME ?? "";
-const HOSTNAME = (await Bun.spawn(["hostname"], { stdout: "pipe" }).stdout.text()).trim();
+const HOSTNAME = (
+  await Bun.spawn(["hostname"], { stdout: "pipe" }).stdout.text()
+).trim();
 
 interface ClaudeInfo {
   status: Status;
   cwd: string;
   hostname: string;
-  pr: { url: string; number: number; title: string; headRefName: string } | null;
+  pr: {
+    url: string;
+    number: number;
+    title: string;
+    headRefName: string;
+  } | null;
 }
 
 const PR_TTL = 2 * 60 * 1000;
@@ -33,14 +44,20 @@ function getRequestUrl(req: IncomingMessage): URL {
   return new URL(req.url ?? "/", `http://${host}`);
 }
 
-function getTerminalCommand(req: IncomingMessage): { cmd: string; args: string[] } {
+function getTerminalCommand(req: IncomingMessage): {
+  cmd: string;
+  args: string[];
+} {
   const url = getRequestUrl(req);
   const rawCmd = url.searchParams.get("cmd") ?? "bash";
   const parts = rawCmd.trim().split(/\s+/);
   return { cmd: parts[0], args: parts.slice(1) };
 }
 
-async function sendResponse(res: ServerResponse, response: Response): Promise<void> {
+async function sendResponse(
+  res: ServerResponse,
+  response: Response,
+): Promise<void> {
   res.statusCode = response.status;
   for (const [key, value] of response.headers.entries()) {
     res.setHeader(key, value);
@@ -68,7 +85,28 @@ async function ensureTmuxSession(sessionName: string): Promise<void> {
     return;
   }
 
-  console.error(`failed to create tmux session ${sessionName}: ${stderr.trim()}`);
+  console.error(
+    `failed to create tmux session ${sessionName}: ${stderr.trim()}`,
+  );
+}
+
+async function sendKeysToTmuxSession(
+  sessionName: string,
+  keys: string[],
+  errorLabel: string,
+): Promise<void> {
+  const proc = Bun.spawn(["tmux", "send-keys", "-t", sessionName, ...keys], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  await proc.exited;
+
+  if (proc.exitCode !== 0) {
+    console.error(
+      `${errorLabel} failed:`,
+      (await new Response(proc.stderr).text()).trim(),
+    );
+  }
 }
 
 // Wait until /tmp/monitor_flag disappears
@@ -81,10 +119,7 @@ while (true) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
-await Promise.all([
-  ensureTmuxSession("claude"),
-  ensureTmuxSession("terminal"),
-]);
+await Promise.all([ensureTmuxSession("claude"), ensureTmuxSession("terminal")]);
 
 function shellEscape(value: string): string {
   if (value.length === 0) {
@@ -98,52 +133,73 @@ const setupCommand = process.env.SETUP_COMMAND;
 console.log("setup command", setupCommand);
 if (setupCommand) {
   console.log("running setup command", setupCommand);
-  const proc = Bun.spawn(["tmux", "send-keys", "-t", "claude", setupCommand, "Enter"], {
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  await proc.exited;
-  if (proc.exitCode !== 0) {
-    console.error("SETUP_COMMAND failed:", (await new Response(proc.stderr).text()).trim());
-  }
+  await sendKeysToTmuxSession(
+    "claude",
+    [setupCommand, "Enter"],
+    "SETUP_COMMAND",
+  );
 }
 
 const claudePrompt = process.env.CLAUDE_PROMPT;
 console.log("claude prompt", claudePrompt);
-if (claudePrompt) {
-  console.log("running claude prompt", claudePrompt);
-  const claudeCommand = `claude --dangerously-skip-permissions --allow-dangerously-skip-permissions --effort high ${shellEscape(claudePrompt)}`;
-  const proc = Bun.spawn(["tmux", "send-keys", "-t", "claude", claudeCommand, "Enter", "Enter"], {
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  await proc.exited;
-  if (proc.exitCode !== 0) {
-    console.error("CLAUDE_PROMPT failed:", (await new Response(proc.stderr).text()).trim());
+const claudeCommand = `claude --dangerously-skip-permissions --allow-dangerously-skip-permissions --effort high${claudePrompt ? ` ${shellEscape(claudePrompt)}` : ""}`;
+await sendKeysToTmuxSession(
+  "claude",
+  [claudeCommand, "Enter"],
+  "CLAUDE_PROMPT",
+);
+
+(async () => {
+  // Wait until "Yes, I trust this folder" appears, then confirm
+  while (true) {
+    const p = Bun.spawn(
+      ["tmux", "capture-pane", "-p", "-S", "0", "-t", "claude"],
+      { stdout: "pipe" },
+    );
+    const paneOutput = await new Response(p.stdout).text();
+    await p.exited;
+    if (paneOutput.includes("Yes, I trust this folder")) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
-} else {
-  const claudeCommand = `claude --dangerously-skip-permissions --allow-dangerously-skip-permissions --effort high`;
-  const proc = Bun.spawn(["tmux", "send-keys", "-t", "claude", claudeCommand, "Enter", "Enter"], {
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  await proc.exited;
-  if (proc.exitCode !== 0) {
-    console.error("CLAUDE_PROMPT failed:", (await new Response(proc.stderr).text()).trim());
+  await sendKeysToTmuxSession("claude", ["Enter"], "CLAUDE_PROMPT_CONFIRM");
+
+  // Get cwd from claude session and sync it to terminal session
+  const p = Bun.spawn(
+    ["tmux", "list-panes", "-t", "claude", "-F", "#{pane_current_path}"],
+    { stdout: "pipe" },
+  );
+  const rawPath = (await new Response(p.stdout).text()).trim();
+  await p.exited;
+  if (rawPath) {
+    await sendKeysToTmuxSession(
+      "terminal",
+      [`cd '${rawPath}'`, "Enter"],
+      "TERMINAL_CD",
+    );
   }
-}
+})();
 
 async function fetchPr(fullPath: string): Promise<ClaudeInfo["pr"]> {
   try {
-    const proc = Bun.spawn(["gh", "pr", "view", "--json", "number,url,title,headRefName"], {
-      cwd: fullPath,
-      stdout: "pipe",
-      stderr: "pipe",
-    });
+    const proc = Bun.spawn(
+      ["gh", "pr", "view", "--json", "number,url,title,headRefName"],
+      {
+        cwd: fullPath,
+        stdout: "pipe",
+        stderr: "pipe",
+      },
+    );
     const out = await new Response(proc.stdout).text();
     await proc.exited;
     if (proc.exitCode === 0) {
-      return JSON.parse(out) as { number: number; url: string; title: string; headRefName: string };
+      return JSON.parse(out) as {
+        number: number;
+        url: string;
+        title: string;
+        headRefName: string;
+      };
     }
   } catch {
     // no PR or gh not available
@@ -180,7 +236,7 @@ async function getClaudeInfo(): Promise<ClaudeInfo> {
     const paneOutput = await new Response(p3.stdout).text();
     await p3.exited;
 
-    if (paneOutput.includes("frolicking")) {
+    if (paneOutput.includes("esc to interrupt")) {
       status = "working";
     } else if (paneOutput.includes("Type something.")) {
       status = "waiting";
@@ -213,7 +269,7 @@ terminalWss.on("connection", (ws, req) => {
     cols: 80,
     rows: 24,
     env: {
-      ...process.env as Record<string, string>,
+      ...(process.env as Record<string, string>),
       TERM: "xterm-256color",
       COLORTERM: "truecolor",
     },
@@ -265,16 +321,22 @@ const server = createServer(async (req, res) => {
     const url = getRequestUrl(req);
 
     if (url.pathname === MONITOR_STATUS_PATH) {
-      await sendResponse(res, new Response(JSON.stringify(await getClaudeInfo()), {
-        headers: { "Content-Type": "application/json" },
-      }));
+      await sendResponse(
+        res,
+        new Response(JSON.stringify(await getClaudeInfo()), {
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
       return;
     }
 
     if (url.pathname === MONITOR_STOP_PATH) {
-      await sendResponse(res, new Response(JSON.stringify({ success: true }), {
-        headers: { "Content-Type": "application/json" },
-      }));
+      await sendResponse(
+        res,
+        new Response(JSON.stringify({ success: true }), {
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
       Bun.spawn(["sudo", "kill", "-TERM", "1"]);
       return;
     }
@@ -304,5 +366,7 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`monitor backend running at http://localhost:${PORT}${MONITOR_STATUS_PATH}`);
+  console.log(
+    `monitor backend running at http://localhost:${PORT}${MONITOR_STATUS_PATH}`,
+  );
 });

@@ -44,19 +44,19 @@ RUN (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
 # Claude
 # auth by setting CLAUDE_CODE_OAUTH_TOKEN env (get from `claude setup-token`)
 RUN curl -fsSL https://claude.ai/install.sh | bash
-COPY dot_claude /home/kasm-user/.claude
-COPY claude.json /home/kasm-user/.claude.json
+COPY --chown=kasm-user:kasm-user dot_claude /home/kasm-user/.claude
+COPY --chown=kasm-user:kasm-user claude.json /home/kasm-user/.claude.json
 
 # Monitor Daemon
 COPY monitor/monitor /opt/monitor/bin/monitor
 COPY monitor/packages/frontend/dist /opt/monitor/www/monitor
+COPY nginx-monitor.conf /etc/nginx/conf.d/monitor.conf
 RUN sudo chmod +x /opt/monitor/bin/monitor
 # kasm docker cleans /tmp on startup, we need to wait until the flag disappears
 RUN touch /tmp/monitor_flag
 
 # General config
 RUN sudo usermod --shell /bin/bash kasm-user
-COPY tmux.conf /home/kasm-user/.tmux.conf
-COPY bashrc /home/kasm-user/.bashrc
+COPY --chown=kasm-user:kasm-user tmux.conf /home/kasm-user/.tmux.conf
+COPY --chown=kasm-user:kasm-user bashrc /home/kasm-user/.bashrc
 RUN rm /home/kasm-user/.bash_history
-COPY nginx-monitor.conf /etc/nginx/conf.d/monitor.conf

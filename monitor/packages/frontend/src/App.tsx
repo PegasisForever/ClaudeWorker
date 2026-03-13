@@ -122,6 +122,17 @@ function AppInner({
   }, [hostname, pr]);
 
   useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (status !== "error") {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [status]);
+
+  useEffect(() => {
     const canvas = document.createElement("canvas");
     canvas.width = 32;
     canvas.height = 32;
@@ -178,36 +189,39 @@ function AppInner({
           >
             Screen
           </NavLink>
+          <button
+            onClick={() => {
+              if (confirm("Are you sure you want to stop the container?")) {
+                void fetch(`${MONITOR_BASE}/api/stop`, { method: "POST" });
+              }
+            }}
+            className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] transition-colors hover:bg-[#ff5555]/10 hover:text-[#ff6e6e]"
+          >
+            Stop
+          </button>
         </div>
+        <div className="flex-1" />
         {pr && (
-          <div className="mx-1 mt-auto rounded-2xl border border-border bg-surface px-3 py-3 shadow-sm shadow-black/5">
-            <a
-              href={pr.url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-semibold text-[#bd93f9] transition-colors hover:text-[#d6acff]"
-            >
-              PR #{pr.number}
-            </a>
-            <div className="mt-2 text-sm leading-5 text-app-secondary">
-              {stripBracketPrefix(pr.title)}
+          <>
+            <div className="mx-2 h-px bg-border" />
+            <div className="mx-1 px-3 py-3">
+              <a
+                href={pr.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-semibold text-[#bd93f9] underline transition-colors hover:text-[#d6acff]"
+              >
+                PR #{pr.number}
+              </a>
+              <div className="mt-2 text-sm leading-5 text-app-secondary">
+                {stripBracketPrefix(pr.title)}
+              </div>
+              <div className="mt-2 break-words font-mono text-[11px] text-app-muted">
+                {pr.headRefName}
+              </div>
             </div>
-            <div className="mt-2 break-words font-mono text-[11px] text-app-muted">
-              {pr.headRefName}
-            </div>
-          </div>
+          </>
         )}
-        <div className="mx-2 h-px bg-border" />
-        <button
-          onClick={() => {
-            if (confirm("Are you sure you want to stop the container?")) {
-              void fetch(`${MONITOR_BASE}/api/stop`, { method: "POST" });
-            }
-          }}
-          className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] transition-colors hover:bg-[#ff5555]/10 hover:text-[#ff6e6e]"
-        >
-          Stop
-        </button>
       </nav>
       <main className="relative min-w-0 flex-1 bg-terminal-bg">
         {/* default redirect */}
