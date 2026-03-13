@@ -9,29 +9,29 @@ interface Props {
 
 const MONITOR_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const DARK_TERMINAL_THEME = {
-  background: "#020617",
-  foreground: "#e2e8f0",
-  cursor: "#93c5fd",
-  cursorAccent: "#020617",
-  selectionBackground: "#60a5fa44",
-  selectionInactiveBackground: "#60a5fa22",
-  black: "#0f172a",
-  red: "#f87171",
-  green: "#4ade80",
-  yellow: "#fbbf24",
-  blue: "#60a5fa",
-  magenta: "#c084fc",
-  cyan: "#22d3ee",
-  white: "#cbd5e1",
-  brightBlack: "#64748b",
-  brightRed: "#fca5a5",
-  brightGreen: "#86efac",
-  brightYellow: "#fde68a",
-  brightBlue: "#93c5fd",
-  brightMagenta: "#d8b4fe",
-  brightCyan: "#67e8f9",
-  brightWhite: "#f8fafc",
+const DRACULA_TERMINAL_THEME = {
+  background: "#282a36",
+  foreground: "#f8f8f2",
+  cursor: "#f8f8f2",
+  cursorAccent: "#282a36",
+  selectionBackground: "#44475a",
+  selectionInactiveBackground: "#44475a88",
+  black: "#21222c",
+  red: "#ff5555",
+  green: "#50fa7b",
+  yellow: "#f1fa8c",
+  blue: "#bd93f9",
+  magenta: "#ff79c6",
+  cyan: "#8be9fd",
+  white: "#f8f8f2",
+  brightBlack: "#6272a4",
+  brightRed: "#ff6e6e",
+  brightGreen: "#69ff94",
+  brightYellow: "#ffffa5",
+  brightBlue: "#d6acff",
+  brightMagenta: "#ff92df",
+  brightCyan: "#a4ffff",
+  brightWhite: "#ffffff",
 };
 
 function isMacPlatform(): boolean {
@@ -84,7 +84,7 @@ export default function TerminalPage({ cmd }: Props) {
       cursorBlink: true,
       fontSize: 14,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      theme: DARK_TERMINAL_THEME,
+      theme: DRACULA_TERMINAL_THEME,
     });
 
     const fitAddon = new FitAddon();
@@ -93,7 +93,7 @@ export default function TerminalPage({ cmd }: Props) {
     fitAddon.fit();
     term.focus();
 
-    containerRef.current?.style.setProperty("background", DARK_TERMINAL_THEME.background);
+    containerRef.current?.style.setProperty("background", DRACULA_TERMINAL_THEME.background);
 
     const handleCopy = () => {
       const selection = term.getSelection();

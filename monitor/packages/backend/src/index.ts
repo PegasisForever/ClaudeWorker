@@ -168,16 +168,29 @@ async function getClaudeInfo(): Promise<ClaudeInfo> {
 
   const fullPath = rawPath.trim();
   const cwd = fullPath.replace(HOME, "~");
+  const currentCommand = paneCmd.trim();
 
-  if (paneCmd.trim() === "bash") {
+  if (currentCommand === "bash") {
     return { status: "idle", cwd, hostname: HOSTNAME, pr: null };
   }
 
-  const p3 = tmux(["capture-pane", "-p", "-S", "0", "-t", "claude"]);
-  const paneOutput = await new Response(p3.stdout).text();
-  await p3.exited;
+  let status: Status;
+  if (currentCommand === "claude") {
+    const p3 = tmux(["capture-pane", "-p", "-S", "0", "-t", "claude"]);
+    const paneOutput = await new Response(p3.stdout).text();
+    await p3.exited;
 
-  const status: Status = paneOutput.includes("frolicking") ? "working" : "waiting";
+    if (paneOutput.includes("frolicking")) {
+      status = "working";
+    } else if (paneOutput.includes("Type something.")) {
+      status = "waiting";
+    } else {
+      status = "idle";
+    }
+  } else {
+    status = "working";
+  }
+
   const now = Date.now();
   const statusChanged = status !== prCache.lastStatus;
   const ttlExpired = now - prCache.lastFetchedAt > PR_TTL;

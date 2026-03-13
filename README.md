@@ -29,7 +29,7 @@ This image (`pegasis0/claude-worker:latest`) is intended to be used as a **start
 
 | Variable | Description |
 |----------|-------------|
-| `CLAUDE_CODE_OAUTH_TOKEN` | OAuth token for authenticating with Claude Code |
+| `CLAUDE_CODE_OAUTH_TOKEN` | OAuth token for authenticating with Claude Code, get from `claude setup-token` |
 | `GITHUB_TOKEN` | GitHub personal access token for repository operations |
 | `SETUP_COMMAND` | Command to run before starting Claude Code (e.g., cloning repos, setting up environment) |
 | `CLAUDE_PROMPT` | Initial prompt to send to Claude Code on startup |

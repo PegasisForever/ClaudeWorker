@@ -32,10 +32,10 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 
 const STATUS_COLOR: Record<Status, string> = {
-  idle: "#8e8e8e",
-  waiting: "#d29922",
-  working: "#3fb950",
-  error: "#e74c3c",
+  idle: "#6272a4",
+  waiting: "#f1fa8c",
+  working: "#50fa7b",
+  error: "#ff5555",
 };
 
 const STATUS_ACCENT_CLASS: Record<Status, string> = {
@@ -58,6 +58,18 @@ function stripBracketPrefix(title: string): string {
 
 function formatHostname(hostname: string): string {
   return hostname.replace(/^worker(\d+)$/i, "W$1");
+}
+
+function showStatusNotification(message: string): void {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") {
+    return;
+  }
+
+  const notification = new Notification(message);
+  notification.onclick = () => {
+    notification.close();
+    window.focus();
+  };
 }
 
 const MONITOR_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -173,7 +185,7 @@ function AppInner({
               href={pr.url}
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-semibold text-sky-600 transition-colors hover:text-sky-500"
+              className="text-sm font-semibold text-[#bd93f9] transition-colors hover:text-[#d6acff]"
             >
               PR #{pr.number}
             </a>
@@ -192,7 +204,7 @@ function AppInner({
               void fetch(`${MONITOR_BASE}/api/stop`, { method: "POST" });
             }
           }}
-          className="text-left mx-1 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors text-rose-500 hover:bg-rose-500/10"
+          className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] transition-colors hover:bg-[#ff5555]/10 hover:text-[#ff6e6e]"
         >
           Stop
         </button>
@@ -231,6 +243,16 @@ export default function App() {
   const previousStatusRef = useRef<Status>("idle");
 
   useEffect(() => {
+    if (typeof Notification === "undefined" || Notification.permission !== "default") {
+      return;
+    }
+
+    void Notification.requestPermission().catch(() => {
+      // Ignore browsers that reject permission requests.
+    });
+  }, []);
+
+  useEffect(() => {
     const poll = async () => {
       try {
         const res = await fetch(`${MONITOR_BASE}/api/status`);
@@ -245,6 +267,12 @@ export default function App() {
         if (previousStatus === "error" && json.status !== "error") {
           window.location.reload();
           return;
+        }
+
+        if (previousStatus === "working" && json.status === "waiting") {
+          showStatusNotification(`${json.hostname} is waiting for your input`);
+        } else if (previousStatus === "working" && json.status === "idle") {
+          showStatusNotification(`${json.hostname} is finished`);
         }
 
         previousStatusRef.current = json.status;
