@@ -108,6 +108,7 @@ function AppInner({
   const location = useLocation();
   const active = location.pathname;
   const [tabHidden, setTabHidden] = useState(document.hidden);
+  const [stopping, setStopping] = useState(false);
 
   useEffect(() => {
     const handler = () => setTabHidden(document.hidden);
@@ -131,6 +132,7 @@ function AppInner({
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [status]);
+
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -159,11 +161,11 @@ function AppInner({
         <div className="px-4 py-3 shadow-sm">
           <div className="flex items-center gap-2">
             <span
-              className={`h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_ACCENT_CLASS[status]}`}
-              style={{ background: STATUS_COLOR[status] }}
+              className={`h-2.5 w-2.5 shrink-0 rounded-full ${stopping && status === "error" ? "bg-rose-500" : STATUS_ACCENT_CLASS[status]}`}
+              style={{ background: stopping && status === "error" ? "#ff5555" : STATUS_COLOR[status] }}
             />
             <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-app-secondary">
-              {STATUS_LABEL[status]}
+              {stopping && status === "error" ? "Stopped" : stopping ? "Stopping..." : STATUS_LABEL[status]}
             </span>
           </div>
           {cwd && (
@@ -189,16 +191,26 @@ function AppInner({
           >
             Screen
           </NavLink>
-          <button
-            onClick={() => {
-              if (confirm("Are you sure you want to stop the container?")) {
-                void fetch(`${MONITOR_BASE}/api/stop`, { method: "POST" });
-              }
-            }}
-            className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] transition-colors hover:bg-[#ff5555]/10 hover:text-[#ff6e6e]"
-          >
-            Stop
-          </button>
+          {stopping && status !== "error" ? (
+            <button
+              disabled
+              className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] opacity-50"
+            >
+              Stopping...
+            </button>
+          ) : !stopping ? (
+            <button
+              onClick={() => {
+                if (confirm("Are you sure you want to stop the container?")) {
+                  setStopping(true);
+                  void fetch(`${MONITOR_BASE}/api/stop`, { method: "POST" });
+                }
+              }}
+              className="mx-1 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[#ff5555] transition-colors hover:bg-[#ff5555]/10 hover:text-[#ff6e6e]"
+            >
+              Stop
+            </button>
+          ) : null}
         </div>
         <div className="flex-1" />
         {pr && (
