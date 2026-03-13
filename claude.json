@@ -2,7 +2,7 @@
   "numStartups": 1,
   "installMethod": "native",
   "autoUpdates": false,
-  "theme": "light",
+  "theme": "dark",
   "cachedGrowthBookFeatures": {
     "tengu_herring_clock": false,
     "tengu_event_sampling_config": {},
@@ -112,5 +112,17 @@
   },
   "cachedExtraUsageDisabledReason": "org_level_disabled",
   "officialMarketplaceAutoInstallAttempted": true,
-  "officialMarketplaceAutoInstalled": true
+  "officialMarketplaceAutoInstalled": true,
+  "mcpServers": {
+    "computer-use": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "computer-use-mcp"],
+      "env": {}
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
 }

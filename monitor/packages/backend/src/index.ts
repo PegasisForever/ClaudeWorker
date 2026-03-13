@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 const MONITOR_API_BASE = "/monitor/api";
 const MONITOR_STATUS_PATH = `${MONITOR_API_BASE}/status`;
+const MONITOR_STOP_PATH = `${MONITOR_API_BASE}/stop`;
 const MONITOR_WS_PATH = "/monitor/ws";
 const PORT = parseInt(process.env.PORT ?? "13001", 10);
 
@@ -81,7 +82,7 @@ while (true) {
 }
 
 await Promise.all([
-  ensureTmuxSession("claude" ),
+  ensureTmuxSession("claude"),
   ensureTmuxSession("terminal"),
 ]);
 
@@ -112,6 +113,16 @@ console.log("claude prompt", claudePrompt);
 if (claudePrompt) {
   console.log("running claude prompt", claudePrompt);
   const claudeCommand = `claude --dangerously-skip-permissions --allow-dangerously-skip-permissions --effort high ${shellEscape(claudePrompt)}`;
+  const proc = Bun.spawn(["tmux", "send-keys", "-t", "claude", claudeCommand, "Enter", "Enter"], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  await proc.exited;
+  if (proc.exitCode !== 0) {
+    console.error("CLAUDE_PROMPT failed:", (await new Response(proc.stderr).text()).trim());
+  }
+} else {
+  const claudeCommand = `claude --dangerously-skip-permissions --allow-dangerously-skip-permissions --effort high`;
   const proc = Bun.spawn(["tmux", "send-keys", "-t", "claude", claudeCommand, "Enter", "Enter"], {
     stdout: "pipe",
     stderr: "pipe",
@@ -244,6 +255,14 @@ const server = createServer(async (req, res) => {
       await sendResponse(res, new Response(JSON.stringify(await getClaudeInfo()), {
         headers: { "Content-Type": "application/json" },
       }));
+      return;
+    }
+
+    if (url.pathname === MONITOR_STOP_PATH) {
+      await sendResponse(res, new Response(JSON.stringify({ success: true }), {
+        headers: { "Content-Type": "application/json" },
+      }));
+      Bun.spawn(["sudo", "kill", "-TERM", "1"]);
       return;
     }
 

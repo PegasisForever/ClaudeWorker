@@ -9,6 +9,31 @@ interface Props {
 
 const MONITOR_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+const DARK_TERMINAL_THEME = {
+  background: "#020617",
+  foreground: "#e2e8f0",
+  cursor: "#93c5fd",
+  cursorAccent: "#020617",
+  selectionBackground: "#60a5fa44",
+  selectionInactiveBackground: "#60a5fa22",
+  black: "#0f172a",
+  red: "#f87171",
+  green: "#4ade80",
+  yellow: "#fbbf24",
+  blue: "#60a5fa",
+  magenta: "#c084fc",
+  cyan: "#22d3ee",
+  white: "#cbd5e1",
+  brightBlack: "#64748b",
+  brightRed: "#fca5a5",
+  brightGreen: "#86efac",
+  brightYellow: "#fde68a",
+  brightBlue: "#93c5fd",
+  brightMagenta: "#d8b4fe",
+  brightCyan: "#67e8f9",
+  brightWhite: "#f8fafc",
+};
+
 function isMacPlatform(): boolean {
   return /Mac|iPhone|iPad|iPod/.test(navigator.platform);
 }
@@ -59,29 +84,7 @@ export default function TerminalPage({ cmd }: Props) {
       cursorBlink: true,
       fontSize: 14,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      theme: {
-        background: "#ffffff",
-        foreground: "#1a1a1a",
-        cursor: "#333333",
-        cursorAccent: "#ffffff",
-        selectionBackground: "#b3d4ff",
-        black: "#000000",
-        red: "#c0392b",
-        green: "#27ae60",
-        yellow: "#d35400",
-        blue: "#2980b9",
-        magenta: "#8e44ad",
-        cyan: "#16a085",
-        white: "#808080",
-        brightBlack: "#555555",
-        brightRed: "#e74c3c",
-        brightGreen: "#2ecc71",
-        brightYellow: "#e67e22",
-        brightBlue: "#3498db",
-        brightMagenta: "#9b59b6",
-        brightCyan: "#1abc9c",
-        brightWhite: "#1a1a1a",
-      },
+      theme: DARK_TERMINAL_THEME,
     });
 
     const fitAddon = new FitAddon();
@@ -89,6 +92,8 @@ export default function TerminalPage({ cmd }: Props) {
     term.open(containerRef.current!);
     fitAddon.fit();
     term.focus();
+
+    containerRef.current?.style.setProperty("background", DARK_TERMINAL_THEME.background);
 
     const handleCopy = () => {
       const selection = term.getSelection();
@@ -230,7 +235,7 @@ export default function TerminalPage({ cmd }: Props) {
   return (
     <div
       ref={containerRef}
-      style={{ width: "100%", height: "100%", background: "#ffffff" }}
+      className="h-full w-full bg-terminal-bg"
     />
   );
 }
