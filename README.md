@@ -35,6 +35,75 @@ This image (`pegasis0/claude-worker:latest`) is intended to be used as a **start
 | `SETUP_COMMAND` | Command to run before starting Claude Code (e.g., cloning repos, setting up environment) |
 | `CLAUDE_PROMPT` | Initial prompt to send to Claude Code on startup |
 
+## API Endpoints
+
+The monitor provides HTTP and WebSocket endpoints at `/monitor/*`:
+
+### `GET /monitor/api/status`
+
+Returns the current state of the Claude Code session.
+
+**Response:**
+```json
+{
+  "status": "working",
+  "cwd": "~/Projects/my-repo",
+  "hostname": "worker1",
+  "pr": {
+    "number": 42,
+    "url": "https://github.com/user/repo/pull/42",
+    "title": "Add new feature",
+    "headRefName": "feature-branch"
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | `"idle" \| "waiting" \| "working"` | Claude session state |
+| `cwd` | `string` | Current working directory (with `$HOME` replaced by `~`) |
+| `hostname` | `string` | Container hostname |
+| `pr` | `object \| null` | Open PR for the current branch (if any) |
+
+**Status values:**
+- `idle` — Claude is not running (bash prompt visible)
+- `waiting` — Claude is waiting for user input
+- `working` — Claude is actively processing
+
+### `POST /monitor/api/stop`
+
+Gracefully stops the container by sending SIGTERM to PID 1.
+
+**Response:**
+```json
+{
+  "success": true
+}
+```
+
+### `WS /monitor/ws?cmd=<command>`
+
+WebSocket endpoint for interactive terminal access via xterm.js. Connects to a PTY running the specified command (defaults to `bash`).
+
+**Query Parameters:**
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `cmd` | `bash` | Command to run in the terminal |
+
+**Message Protocol:**
+
+Client → Server:
+```json
+{ "type": "input", "data": "ls\n" }
+{ "type": "resize", "cols": 120, "rows": 40 }
+```
+
+Server → Client:
+```json
+{ "type": "output", "data": "terminal output here" }
+{ "type": "exit", "exitCode": 0 }
+```
+
 ## Example
 
 ```bash
