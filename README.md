@@ -81,6 +81,17 @@ Gracefully stops the container by sending SIGTERM to PID 1.
 }
 ```
 
+### `GET /monitor/api/health`
+
+Health check endpoint that always returns 200 OK when the monitor is running. Used by Docker health checks.
+
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
+
 ### `WS /monitor/ws?cmd=<command>`
 
 WebSocket endpoint for interactive terminal access via xterm.js. Connects to a PTY running the specified command (defaults to `bash`).

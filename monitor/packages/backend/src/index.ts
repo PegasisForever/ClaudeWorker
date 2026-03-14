@@ -9,6 +9,7 @@ import { WebSocketServer, WebSocket, type RawData } from "ws";
 const MONITOR_API_BASE = "/monitor/api";
 const MONITOR_STATUS_PATH = `${MONITOR_API_BASE}/status`;
 const MONITOR_STOP_PATH = `${MONITOR_API_BASE}/stop`;
+const MONITOR_HEALTH_PATH = `${MONITOR_API_BASE}/health`;
 const MONITOR_WS_PATH = "/monitor/ws";
 const PORT = parseInt(process.env.PORT ?? "51301", 10);
 
@@ -338,6 +339,16 @@ const server = createServer(async (req, res) => {
         }),
       );
       Bun.spawn(["sudo", "kill", "-TERM", "1"]);
+      return;
+    }
+
+    if (url.pathname === MONITOR_HEALTH_PATH) {
+      await sendResponse(
+        res,
+        new Response(JSON.stringify({ status: "ok" }), {
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
       return;
     }
 

@@ -60,3 +60,7 @@ RUN sudo usermod --shell /bin/bash kasm-user
 COPY --chown=kasm-user:kasm-user tmux.conf /home/kasm-user/.tmux.conf
 COPY --chown=kasm-user:kasm-user bashrc /home/kasm-user/.bashrc
 RUN rm /home/kasm-user/.bash_history
+
+# Health check - polls the monitor health endpoint every 1s
+HEALTHCHECK --interval=1s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -fsS http://localhost:51301/monitor/api/health > /dev/null || exit 1
